@@ -241,11 +241,11 @@ class MessagingSkill(CommonMessageSkill):
 
     def handle_send_email(self, message):
         LOG.debug(message.data)
+        user = self.get_utterance_user(message)
         # if self.neon_in_request(message) and message.context["mobile"]:
         if message.context["mobile"]:
-            user = "local"
-            if self.server:
-                user = nick(message.context["flac_filename"])
+            # if self.server:
+            #     user = nick(message.context["flac_filename"])
             # LOG.debug(f"DM: {self.drafts[user]}")
             self.drafts[user] = {"kind": "email",
                                  "recipient": "",
@@ -279,12 +279,12 @@ class MessagingSkill(CommonMessageSkill):
 
     def handle_send_sms(self, message):
         LOG.debug(message)
+        user = self.get_utterance_user(message)
         # if self.neon_in_request(message) and message.context["mobile"]:
         if message.context["mobile"]:
-            user = "local"
             flac_filename = message.context["flac_filename"]
-            if self.server:
-                user = nick(flac_filename)
+            # if self.server:
+            #     user = nick(flac_filename)
             # LOG.debug(f"DM: {self.drafts[user]}")
 
             # Check for data from CMS match
@@ -327,10 +327,10 @@ class MessagingSkill(CommonMessageSkill):
 
     def handle_place_call(self, message):
         if message.context.get("mobile"):
-            user = "local"
+            user = self.get_utterance_user(message)
             flac_filename = message.context["flac_filename"]
-            if self.server:
-                user = nick(flac_filename)
+            # if self.server:
+            #     user = nick(flac_filename)
             call_data = message.data["skill_data"]
             LOG.debug(call_data)
             number = call_data["number"]
@@ -356,9 +356,9 @@ class MessagingSkill(CommonMessageSkill):
     def converse(self, utterances, lang="en-us", message=None):
         LOG.info(f"utterances={utterances}")
         LOG.debug(f"message.data={message.data}")
-        user = "local"
-        if self.server:
-            user = nick(message.context["flac_filename"])
+        user = self.get_utterance_user(message)
+        # if self.server:
+        #     user = nick(message.context["flac_filename"])
 
         # Check if user has started a draft
         if self.drafts and user in self.drafts:
