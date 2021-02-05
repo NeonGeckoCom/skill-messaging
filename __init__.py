@@ -274,6 +274,7 @@ class MessagingSkill(CommonMessageSkill):
             else:
                 self.speak_dialog("GetRecipientAddress", {"kind": "email"}, private=True, expect_response=True)
         else:
+            # TODO: Yagmail implementation see mycroft.api.CouponEmail
             self.speak_dialog("OnlyMobile", {"action": "send emails"}, private=True)
             # self.speak("I'm only able to send emails from mobile devices right now.")
 
