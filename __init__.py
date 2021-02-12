@@ -18,10 +18,10 @@
 # China Patent: CN102017585  -  Europe Patent: EU2156652  -  Patents Pending
 
 from adapt.intent import IntentBuilder
-from mycroft import MycroftSkill
+# from mycroft import MycroftSkill
 from mycroft.skills.common_message_skill import CommonMessageSkill, CMSMatchLevel
 from mycroft.util import LOG
-from NGI.utilities.chat_user_util import get_chat_nickname_from_filename as nick
+# from NGI.utilities.chat_user_util import get_chat_nickname_from_filename as nick
 import phonenumbers
 import re
 
