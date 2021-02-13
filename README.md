@@ -1,18 +1,18 @@
-# ![](https://0000.us/klatchat/app/files/neon_images/icons/neon_paw.png)Messaging
+# <img src='https://0000.us/klatchat/app/files/neon_images/icons/neon_skill.png' card_color="#FF8600" width="50" style="vertical-align:bottom">Messaging
 
-# Summary
+## Summary
 
 Handles mobile requests for phone calls, SMS, and emails.
 
-# Requirements
+## Requirements
 
 Any special requirements should be listed here
 
-# Description
+## Description
 
 This handles SMS, phone call, and email requests.
 
-# How to Use
+## Examples
 
 Place Call:
 - call Daniel
@@ -22,11 +22,11 @@ Send a Message:
 - Send a text message to Daniel that says hello
 - Send an email to demo@neongecko.com with the subject Test Email
 
-# Location
+## Location
 
     ${skills}/messaging.neon
 
-# Examples
+## Details
 
 ### Text
 
@@ -39,11 +39,11 @@ Send a Message:
 
   
 
-# Contact Support
+## Contact Support
 
 Use the [link](https://neongecko.com/ContactUs) or [submit an issue on GitHub](https://help.github.com/en/articles/creating-an-issue)
 
-# Credits
+## Credits
 
 [NeonDaniel](https://github.com/NeonDaniel) [neongeckocom](https://neongecko.com/) Mycroft AI
 

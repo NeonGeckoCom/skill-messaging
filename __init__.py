@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
 #
-# Copyright 2008-2020 Neongecko.com Inc. | All Rights Reserved
+# Copyright 2008-2021 Neongecko.com Inc. | All Rights Reserved
 #
 # Notice of License - Duplicating this Notice of License near the start of any file containing
 # a derivative of this software is a condition of license for this software.
@@ -14,14 +14,14 @@
 # Authors: Guy Daniels, Daniel McKnight, Regina Bloomstine, Elon Gasper, Richard Leeds
 #
 # Specialized conversational reconveyance options from Conversation Processing Intelligence Corp.
-# US Patents 2008-2020: US7424516, US20140161250, US20140177813, US8638908, US8068604, US8553852, US10530923, US10530924
+# US Patents 2008-2021: US7424516, US20140161250, US20140177813, US8638908, US8068604, US8553852, US10530923, US10530924
 # China Patent: CN102017585  -  Europe Patent: EU2156652  -  Patents Pending
 
 from adapt.intent import IntentBuilder
-from mycroft import MycroftSkill
+# from mycroft import MycroftSkill
 from mycroft.skills.common_message_skill import CommonMessageSkill, CMSMatchLevel
 from mycroft.util import LOG
-from NGI.utilities.chat_user_util import get_chat_nickname_from_filename as nick
+# from NGI.utilities.chat_user_util import get_chat_nickname_from_filename as nick
 import phonenumbers
 import re
 
@@ -274,6 +274,7 @@ class MessagingSkill(CommonMessageSkill):
             else:
                 self.speak_dialog("GetRecipientAddress", {"kind": "email"}, private=True, expect_response=True)
         else:
+            # TODO: Yagmail implementation see mycroft.api.CouponEmail
             self.speak_dialog("OnlyMobile", {"action": "send emails"}, private=True)
             # self.speak("I'm only able to send emails from mobile devices right now.")
 
