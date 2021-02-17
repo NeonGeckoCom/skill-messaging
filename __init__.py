@@ -243,7 +243,7 @@ class MessagingSkill(CommonMessageSkill):
         LOG.debug(message.data)
         user = self.get_utterance_user(message)
         # if self.neon_in_request(message) and message.context["mobile"]:
-        if message.context["mobile"]:
+        if self.request_from_mobile(message):
             # if self.server:
             #     user = nick(message.context["flac_filename"])
             # LOG.debug(f"DM: {self.drafts[user]}")
@@ -282,7 +282,7 @@ class MessagingSkill(CommonMessageSkill):
         LOG.debug(message)
         user = self.get_utterance_user(message)
         # if self.neon_in_request(message) and message.context["mobile"]:
-        if message.context["mobile"]:
+        if self.request_from_mobile(message):
             flac_filename = message.context["flac_filename"]
             # if self.server:
             #     user = nick(flac_filename)
@@ -301,9 +301,10 @@ class MessagingSkill(CommonMessageSkill):
                                      "message": sms,
                                      "flac_filename": flac_filename,
                                      "next_input": "confirmation"}
-                if message.context["mobile"]:
-                    self.socket_io_emit('get_contact', f"&recipient={recipient}",
-                                        message.context["flac_filename"])
+                if self.request_from_mobile(message):
+                    self.mobile_skill_intent("get_contact", {"recipient": recipient}, message)
+                    # self.socket_io_emit('get_contact', f"&recipient={recipient}",
+                    #                     message.context["flac_filename"])
                 else:
                     self.speak_dialog("OnlyMobile", {"action": "send text messages"}, private=True)
                     # self.speak("This skill is currently only available for Android users.")
@@ -344,8 +345,9 @@ class MessagingSkill(CommonMessageSkill):
                 message.data["sender"] = user
                 self.handle_confirm_message(message)
             else:
-                self.socket_io_emit('get_contact', f"&recipient={recipient}",
-                                    message.context["flac_filename"])
+                self.mobile_skill_intent("get_contact", {"recipient": recipient}, message)
+                # self.socket_io_emit('get_contact', f"&recipient={recipient}",
+                #                     message.context["flac_filename"])
         else:
             LOG.debug(message.data["skill_data"])
             self.speak_dialog("OnlyMobile", {"action": "call phone numbers"}, private=True)
@@ -384,9 +386,10 @@ class MessagingSkill(CommonMessageSkill):
                     LOG.info(data)
                     data["next_input"] = "confirmation"
                     # self.speak("Would you like to send your message?")
-                    if message.context["mobile"]:
-                        self.socket_io_emit('get_contact', f"&recipient={data['recipient']}",
-                                            message.context["flac_filename"])
+                    if self.request_from_mobile(message):
+                        self.mobile_skill_intent("get_contact", {"recipient": data['recipient']}, message)
+                        # self.socket_io_emit('get_contact', f"&recipient={data['recipient']}",
+                        #                     message.context["flac_filename"])
                     else:
                         self.speak_dialog("ConfirmMessage", {"kind": "email",
                                                              "name": data["recipient"],
@@ -415,8 +418,9 @@ class MessagingSkill(CommonMessageSkill):
                 elif data["next_input"] == "message":
                     data["message"] = str(utterances[0]).strip()
                     data["next_input"] = "confirmation"
-                    self.socket_io_emit('get_contact', f"&number={data['recipient']}",
-                                        message.context["flac_filename"])
+                    self.mobile_skill_intent("get_contact", {"number": data['recipient']}, message)
+                    # self.socket_io_emit('get_contact', f"&number={data['recipient']}",
+                    #                     message.context["flac_filename"])
                 elif data["next_input"] == "confirmation":
                     # Check if send is declined
                     if self.voc_match(utterances[0], "no"):
@@ -452,9 +456,10 @@ class MessagingSkill(CommonMessageSkill):
         number = data.get("number")
         name = data.get("name")
         self.speak(f"Calling {name}.", private=True)  # TODO: Dialog file DM
-        if message.context["mobile"]:
+        if self.request_from_mobile(message):
             num = ''.join(re.findall(r'\d', number))
-            self.socket_io_emit('call', f"&number={num}", message.context["flac_filename"])
+            self.mobile_skill_intent("call", {"number": num}, message)
+            # self.socket_io_emit('call', f"&number={num}", message.context["flac_filename"])
 
     def _send_sms(self, message, user):
         self.speak_dialog("TextSent")  # TODO: Private?
@@ -468,8 +473,10 @@ class MessagingSkill(CommonMessageSkill):
         content = data["message"]
         self.drafts.pop(user)
 
-        if message.context["mobile"]:
-            self.socket_io_emit('sms', f"&number={recipient}&text={content}", message.context["flac_filename"])
+        if self.request_from_mobile(message):
+            self.mobile_skill_intent("sms", {"number": recipient,
+                                             "text": content}, message)
+            # self.socket_io_emit('sms', f"&number={recipient}&text={content}", message.context["flac_filename"])
 
     def _send_email(self, message, user):
         self.speak_dialog("EmailSent", private=True)
@@ -479,9 +486,12 @@ class MessagingSkill(CommonMessageSkill):
         body = data["body"]
         self.drafts.pop(user)
         LOG.info(f"Send Email: {data}")
-        if message.context["mobile"]:
-            self.socket_io_emit('email', f"&recipient={recipient}&subject={subject}&body={body}",
-                                message.context["flac_filename"])
+        if self.request_from_mobile(message):
+            self.mobile_skill_intent("email", {"recipient": recipient,
+                                               "subject": subject,
+                                               "body": body}, message)
+            # self.socket_io_emit('email', f"&recipient={recipient}&subject={subject}&body={body}",
+            #                     message.context["flac_filename"])
         else:
             pass
             # # TODO: Send here DM
