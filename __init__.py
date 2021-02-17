@@ -356,7 +356,8 @@ class MessagingSkill(CommonMessageSkill):
         pass
         # TODO: Draft and send private message via Klat DM
 
-    def converse(self, utterances, lang="en-us", message=None):
+    def converse(self, message=None):
+        utterances = message.data.get("utterances")
         LOG.info(f"utterances={utterances}")
         LOG.debug(f"message.data={message.data}")
         user = self.get_utterance_user(message)
