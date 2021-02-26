@@ -124,7 +124,7 @@ class MessagingSkill(CommonMessageSkill):
         try:
             user = message.data.get("sender")
             draft = self.drafts[user]
-            message.context["flac_filename"] = draft["flac_filename"]
+            message.context["klat_data"] = draft["context"]["klat_data"]
             LOG.debug(f"message.data={message.data}")
             LOG.debug(f"draft={draft}")
             if message.data.get("contact_data") and message.data.get("contact_data") != "None":
@@ -251,7 +251,8 @@ class MessagingSkill(CommonMessageSkill):
                                  "recipient": "",
                                  "subject": "",
                                  "body": "",
-                                 "flac_filename": message.context["flac_filename"],
+                                 "context": message.context,
+                                 # "flac_filename": message.context["flac_filename"],
                                  "next_input": "recipient"}
 
             # Check for data from CMS match
@@ -283,7 +284,7 @@ class MessagingSkill(CommonMessageSkill):
         user = self.get_utterance_user(message)
         # if self.neon_in_request(message) and message.context["mobile"]:
         if self.request_from_mobile(message):
-            flac_filename = message.context["flac_filename"]
+            # flac_filename = message.context["flac_filename"]
             # if self.server:
             #     user = nick(flac_filename)
             # LOG.debug(f"DM: {self.drafts[user]}")
@@ -299,7 +300,8 @@ class MessagingSkill(CommonMessageSkill):
                 self.drafts[user] = {"kind": "text message",
                                      "recipient": recipient,
                                      "message": sms,
-                                     "flac_filename": flac_filename,
+                                     "context": message.context,
+                                     # "flac_filename": flac_filename,
                                      "next_input": "confirmation"}
                 if self.request_from_mobile(message):
                     self.mobile_skill_intent("get_contact", {"recipient": recipient}, message)
@@ -313,14 +315,16 @@ class MessagingSkill(CommonMessageSkill):
                 self.drafts[user] = {"kind": "text message",
                                      "recipient": recipient,
                                      "message": "",
-                                     "flac_filename": flac_filename,
+                                     "context": message.context,
+                                     # "flac_filename": flac_filename,
                                      "next_input": "message"}
                 self.speak("What is the message?", private=True, expect_response=True)
             else:
                 self.drafts[user] = {"kind": "text message",
                                      "recipient": "",
                                      "message": "",
-                                     "flac_filename": flac_filename,
+                                     "context": message.context,
+                                     # "flac_filename": flac_filename,
                                      "next_input": "recipient"}
                 self.speak_dialog("GetRecipientAddress", {"kind": "email"}, private=True, expect_response=True)
         else:
@@ -330,7 +334,7 @@ class MessagingSkill(CommonMessageSkill):
     def handle_place_call(self, message):
         if message.context.get("mobile"):
             user = self.get_utterance_user(message)
-            flac_filename = message.context["flac_filename"]
+            # flac_filename = message.context["flac_filename"]
             # if self.server:
             #     user = nick(flac_filename)
             call_data = message.data["skill_data"]
@@ -340,7 +344,7 @@ class MessagingSkill(CommonMessageSkill):
             self.drafts[user] = {"kind": "call",
                                  "recipient": recipient,
                                  "number": number,
-                                 "flac_filename": flac_filename}
+                                 "context": message.context}
             if number:
                 message.data["sender"] = user
                 self.handle_confirm_message(message)
