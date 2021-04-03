@@ -19,8 +19,8 @@
 
 from adapt.intent import IntentBuilder
 # from mycroft import MycroftSkill
-from mycroft.skills.common_message_skill import CommonMessageSkill, CMSMatchLevel
-from mycroft.util import LOG
+from neon_utils.skills.common_message_skill import CommonMessageSkill, CMSMatchLevel
+from neon_utils.logger import LOG
 # from NGI.utilities.chat_user_util import get_chat_nickname_from_filename as nick
 import phonenumbers
 import re
