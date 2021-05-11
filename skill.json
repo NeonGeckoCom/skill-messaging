@@ -40,6 +40,5 @@
     ],
     "skillname": "Messaging",
     "authorname": "Neon",
-    "foldername": "messaging.neon",
-    "download_url": "https://api.github.com/repos/NeonGeckoCom/messaging.neon/zipball/master"
+    "foldername": "messaging.neon"
 }
