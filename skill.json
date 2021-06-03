@@ -28,7 +28,7 @@
         "arm64",
         "arm"
     ],
-    "branch": "master",
+    "branch": "dev",
     "license": "NeonAI License v1.0",
     "icon": "https://0000.us/klatchat/app/files/neon_images/icons/neon_skill.png",
     "category": "",
@@ -40,5 +40,5 @@
     ],
     "skillname": "Messaging",
     "authorname": "Neon",
-    "foldername": "messaging.neon"
+    "foldername": null
 }
