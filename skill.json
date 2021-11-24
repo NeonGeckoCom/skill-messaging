@@ -1,6 +1,6 @@
 {
     "title": "Messaging",
-    "url": "https://github.com/NeonGeckoCom/messaging.neon",
+    "url": "https://github.com/NeonGeckoCom/skill-messaging.git",
     "summary": "Handles mobile requests for phone calls, SMS, and emails.",
     "short_description": "Handles mobile requests for phone calls, SMS, and emails.",
     "description": "This handles SMS, phone call, and email requests.",
@@ -29,7 +29,7 @@
         "arm"
     ],
     "branch": "master",
-    "license": "NeonAI License v1.0",
+    "license": "BSD-3-Clause",
     "icon": "https://0000.us/klatchat/app/files/neon_images/icons/neon_skill.png",
     "category": "",
     "categories": [
@@ -37,6 +37,10 @@
     ],
     "tags": [
         ""
+    ],
+    "credits": [
+        "NeonDaniel",
+        "NeonGeckoCom"
     ],
     "skillname": "Messaging",
     "authorname": "NeonGeckoCom",
