@@ -44,6 +44,14 @@ Send a Message:
 Use the [link](https://neongecko.com/ContactUs) or [submit an issue on GitHub](https://help.github.com/en/articles/creating-an-issue)
 
 ## Credits
+[NeonDaniel](https://github.com/NeonDaniel)
+[NeonGeckoCom](https://github.com/NeonGeckoCom)
 
-[NeonDaniel](https://github.com/NeonDaniel) [neongeckocom](https://neongecko.com/) Mycroft AI
-
+## Tags
+#NeonGecko Original
+#NeonAI
+#Communication
+#SMS
+#Email
+#Phone
+#Android
