@@ -4,10 +4,6 @@
 
 Handles mobile requests for phone calls, SMS, and emails.
 
-## Requirements
-
-Any special requirements should be listed here
-
 ## Description
 
 This handles SMS, phone call, and email requests.
@@ -21,23 +17,6 @@ Place Call:
 Send a Message:
 - Send a text message to Daniel that says hello
 - Send an email to demo@neongecko.com with the subject Test Email
-
-## Location
-
-    ${skills}/messaging.neon
-
-## Details
-
-### Text
-
-        {example user input}
-        >> {example response}
-
-### Picture
-
-### Video
-
-  
 
 ## Contact Support
 
