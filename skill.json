@@ -15,7 +15,8 @@
     "systemDeps": false,
     "requirements": {
         "python": [
-            "phonenumbers>=8.12.0"
+            "neon-utils~=0.6",
+            "phonenumbers~=8.12"
         ],
         "system": {},
         "skill": []
