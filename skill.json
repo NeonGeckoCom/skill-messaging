@@ -13,7 +13,13 @@
     "desktopFile": false,
     "warning": "",
     "systemDeps": false,
-    "requirements": "Any special requirements should be listed here",
+    "requirements": {
+        "python": [
+            "phonenumbers>=8.12.0"
+        ],
+        "system": {},
+        "skill": []
+    },
     "incompatible_skills": [],
     "platforms": [
         "i386",
@@ -42,6 +48,5 @@
     ],
     "skillname": "skill-messaging",
     "authorname": "NeonGeckoCom",
-    "foldername": null,
-    "location": "    ${skills}/messaging.neon"
+    "foldername": null
 }
