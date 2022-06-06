@@ -1,1 +1,2 @@
-phonenumbers>=8.12.0
+phonenumbers~=8.12
+neon-utils~=0.6
