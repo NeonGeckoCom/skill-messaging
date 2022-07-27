@@ -27,11 +27,10 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from adapt.intent import IntentBuilder
-# from mycroft import MycroftSkill
 from neon_utils.message_utils import request_from_mobile
 from neon_utils.skills.common_message_skill import CommonMessageSkill, CMSMatchLevel
+from neon_utils.user_utils import get_message_user
 from neon_utils.logger import LOG
-# from NGI.utilities.chat_user_util import get_chat_nickname_from_filename as nick
 import phonenumbers
 import re
 
@@ -42,20 +41,13 @@ class MessagingSkill(CommonMessageSkill):
         self.drafts = {}
 
     def initialize(self):
-        # draft_sms_intent = IntentBuilder("DraftSmsIntent").optionally("Neon").require("draft").require("text") \
-        #     .optionally("message").build()
-        # self.register_intent(draft_sms_intent, self.handle_send_sms)
-        #
-        draft_email_intent = IntentBuilder("DraftEmailIntent").optionally("Neon").require("draft").require("email") \
+        draft_email_intent = IntentBuilder("DraftEmailIntent")\
+            .optionally("Neon").require("draft").require("email") \
             .optionally("message").build()
         self.register_intent(draft_email_intent, self.handle_send_email)
-        #
-        # draft_klat_intent = IntentBuilder("DraftKlatShoutIntent").optionally("Neon").require("draft").require("klat")\
-        #     .require("message").build()
-        # self.register_intent(draft_klat_intent, self.handle_send_private)
 
-        self.add_event("neon.messaging.confirmation", self.handle_confirm_message)
-        # self.add_event("communication:send.message", self.handle_send_message)
+        self.add_event("neon.messaging.confirmation",
+                       self.handle_confirm_message)
 
     def CMS_handle_send_message(self, message):
         self.make_active()
@@ -251,7 +243,7 @@ class MessagingSkill(CommonMessageSkill):
 
     def handle_send_email(self, message):
         LOG.debug(message.data)
-        user = self.get_utterance_user(message)
+        user = get_message_user(message)
         # if self.neon_in_request(message) and message.context["mobile"]:
         if request_from_mobile(message):
             # if self.server:
@@ -291,7 +283,7 @@ class MessagingSkill(CommonMessageSkill):
 
     def handle_send_sms(self, message):
         LOG.debug(message)
-        user = self.get_utterance_user(message)
+        user = get_message_user(message)
         # if self.neon_in_request(message) and message.context["mobile"]:
         if request_from_mobile(message):
             # flac_filename = message.context["flac_filename"]
@@ -314,7 +306,9 @@ class MessagingSkill(CommonMessageSkill):
                                      # "flac_filename": flac_filename,
                                      "next_input": "confirmation"}
                 if request_from_mobile(message):
-                    self.mobile_skill_intent("get_contact", {"recipient": recipient}, message)
+                    pass
+                    # TODO
+                    # self.mobile_skill_intent("get_contact", {"recipient": recipient}, message)
                     # self.socket_io_emit('get_contact', f"&recipient={recipient}",
                     #                     message.context["flac_filename"])
                 else:
@@ -343,7 +337,7 @@ class MessagingSkill(CommonMessageSkill):
 
     def handle_place_call(self, message):
         if message.context.get("mobile"):
-            user = self.get_utterance_user(message)
+            user = get_message_user(message)
             # flac_filename = message.context["flac_filename"]
             # if self.server:
             #     user = nick(flac_filename)
@@ -358,8 +352,9 @@ class MessagingSkill(CommonMessageSkill):
             if number:
                 message.data["sender"] = user
                 self.handle_confirm_message(message)
-            else:
-                self.mobile_skill_intent("get_contact", {"recipient": recipient}, message)
+            # else:
+                # TODO
+                # self.mobile_skill_intent("get_contact", {"recipient": recipient}, message)
                 # self.socket_io_emit('get_contact', f"&recipient={recipient}",
                 #                     message.context["flac_filename"])
         else:
@@ -374,7 +369,7 @@ class MessagingSkill(CommonMessageSkill):
         utterances = message.data.get("utterances")
         LOG.info(f"utterances={utterances}")
         LOG.debug(f"message.data={message.data}")
-        user = self.get_utterance_user(message)
+        user = get_message_user(message)
         # if self.server:
         #     user = nick(message.context["flac_filename"])
 
@@ -402,7 +397,9 @@ class MessagingSkill(CommonMessageSkill):
                     data["next_input"] = "confirmation"
                     # self.speak("Would you like to send your message?")
                     if request_from_mobile(message):
-                        self.mobile_skill_intent("get_contact", {"recipient": data['recipient']}, message)
+                        pass
+                        # TODO
+                        # self.mobile_skill_intent("get_contact", {"recipient": data['recipient']}, message)
                         # self.socket_io_emit('get_contact', f"&recipient={data['recipient']}",
                         #                     message.context["flac_filename"])
                     else:
@@ -433,7 +430,8 @@ class MessagingSkill(CommonMessageSkill):
                 elif data["next_input"] == "message":
                     data["message"] = str(utterances[0]).strip()
                     data["next_input"] = "confirmation"
-                    self.mobile_skill_intent("get_contact", {"number": data['recipient']}, message)
+                    # TODO
+                    # self.mobile_skill_intent("get_contact", {"number": data['recipient']}, message)
                     # self.socket_io_emit('get_contact', f"&number={data['recipient']}",
                     #                     message.context["flac_filename"])
                 elif data["next_input"] == "confirmation":
@@ -473,7 +471,8 @@ class MessagingSkill(CommonMessageSkill):
         self.speak(f"Calling {name}.", private=True)  # TODO: Dialog file DM
         if request_from_mobile(message):
             num = ''.join(re.findall(r'\d', number))
-            self.mobile_skill_intent("call", {"number": num}, message)
+            # TODO
+            # self.mobile_skill_intent("call", {"number": num}, message)
             # self.socket_io_emit('call', f"&number={num}", message.context["flac_filename"])
 
     def _send_sms(self, message, user):
@@ -489,8 +488,10 @@ class MessagingSkill(CommonMessageSkill):
         self.drafts.pop(user)
 
         if request_from_mobile(message):
-            self.mobile_skill_intent("sms", {"number": recipient,
-                                             "text": content}, message)
+            pass
+            # TODO
+            # self.mobile_skill_intent("sms", {"number": recipient,
+            #                                  "text": content}, message)
             # self.socket_io_emit('sms', f"&number={recipient}&text={content}", message.context["flac_filename"])
 
     def _send_email(self, message, user):
@@ -501,18 +502,19 @@ class MessagingSkill(CommonMessageSkill):
         body = data["body"]
         self.drafts.pop(user)
         LOG.info(f"Send Email: {data}")
-        if request_from_mobile(message):
-            self.mobile_skill_intent("email", {"recipient": recipient,
-                                               "subject": subject,
-                                               "body": body}, message)
-            # self.socket_io_emit('email', f"&recipient={recipient}&subject={subject}&body={body}",
-            #                     message.context["flac_filename"])
-        else:
-            pass
-            # # TODO: Send here DM
-            # self.bus.emit(Message("neon.email", {"title": data["subject"],
-            #                                      "email": data["recipient"],
-            #                                      "body": data["body"]}))
+        # TODO
+        # if request_from_mobile(message):
+        #     self.mobile_skill_intent("email", {"recipient": recipient,
+        #                                        "subject": subject,
+        #                                        "body": body}, message)
+        #     # self.socket_io_emit('email', f"&recipient={recipient}&subject={subject}&body={body}",
+        #     #                     message.context["flac_filename"])
+        # else:
+        #     pass
+        #     # # TODO: Send here DM
+        #     # self.bus.emit(Message("neon.email", {"title": data["subject"],
+        #     #                                      "email": data["recipient"],
+        #     #                                      "body": data["body"]}))
 
     @staticmethod
     def _extract_content_sms(utt):
