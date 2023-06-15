@@ -38,8 +38,8 @@ import re
 
 
 class MessagingSkill(CommonMessageSkill):
-    def __init__(self):
-        super(MessagingSkill, self).__init__(name="MessagingSkill")
+    def __init__(self, **kwargs):
+        CommonMessageSkill.__init__(self, **kwargs)
         self.drafts = {}
 
     @classproperty
@@ -54,6 +54,7 @@ class MessagingSkill(CommonMessageSkill):
                                    no_network_fallback=False,
                                    no_gui_fallback=True)
 
+    # TODO: Move to __init__ after ovos-workshop stable release
     def initialize(self):
         draft_email_intent = IntentBuilder("DraftEmailIntent")\
             .optionally("Neon").require("draft").require("email") \
@@ -614,7 +615,3 @@ class MessagingSkill(CommonMessageSkill):
 
     def stop(self):
         pass
-
-
-def create_skill():
-    return MessagingSkill()
