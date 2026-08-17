@@ -28,8 +28,10 @@
 
 from ovos_workshop.intents import IntentBuilder
 from neon_utils.message_utils import request_from_mobile
+from neon_utils.native_actions import invoke_native_action
 from neon_utils.skills.common_message_skill import CommonMessageSkill, CMSMatchLevel
 from neon_utils.user_utils import get_message_user
+from neon_data_models.enum import NodeNativeAction
 from ovos_utils import classproperty
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import RuntimeRequirements
@@ -258,6 +260,9 @@ class MessagingSkill(CommonMessageSkill):
 
     def handle_send_email(self, message):
         LOG.debug(message.data)
+        if message.context.get("node"):
+            self._handle_send_email_node(message)
+            return
         user = get_message_user(message)
         # if self.neon_in_request(message) and message.context["mobile"]:
         if request_from_mobile(message):
@@ -298,6 +303,9 @@ class MessagingSkill(CommonMessageSkill):
 
     def handle_send_sms(self, message):
         LOG.debug(message)
+        if message.context.get("node"):
+            self._handle_send_sms_node(message)
+            return
         user = get_message_user(message)
         # if self.neon_in_request(message) and message.context["mobile"]:
         if request_from_mobile(message):
@@ -349,6 +357,46 @@ class MessagingSkill(CommonMessageSkill):
         else:
             self.speak_dialog("OnlyMobile", {"action": "send text messages"}, private=True)
             # self.speak("I'm only able to send text messages from mobile devices right now.")
+
+    def _handle_send_sms_node(self, message):
+        """
+        Single-shot Node path for `text X that Y`. Does not use the mobile
+        draft state machine: extraction already ran in
+        `CMS_match_message_phrase`, so this dispatches straight to the
+        neon-utils helper.
+        """
+        skill_data = message.data.get("skill_data") or {}
+        recipient = skill_data.get("recipient")
+        body = skill_data.get("message")
+        if not recipient or not body:
+            LOG.warning(f"Node SMS request missing recipient or body: "
+                       f"{skill_data}")
+            self.speak_dialog("ErrorDialog", message=message)
+            return
+        invoke_native_action(self, message, NodeNativeAction.LAUNCH_SMS_APP,
+                            params={"to": recipient, "body": body})
+
+    def _handle_send_email_node(self, message):
+        """
+        Single-shot Node path for `email X about Y`. Same rationale as
+        `_handle_send_sms_node`: no draft state machine for Node requests.
+        """
+        skill_data = message.data.get("skill_data") or {}
+        recipient = skill_data.get("recipient")
+        subject = skill_data.get("subject")
+        body = skill_data.get("body")
+        if not recipient or not (subject or body):
+            LOG.warning(f"Node email request missing recipient or content: "
+                       f"{skill_data}")
+            self.speak_dialog("ErrorDialog", message=message)
+            return
+        params = {"to": recipient}
+        if subject:
+            params["subject"] = subject
+        if body:
+            params["body"] = body
+        invoke_native_action(self, message, NodeNativeAction.LAUNCH_EMAIL_APP,
+                            params=params)
 
     def handle_place_call(self, message):
         if message.context.get("mobile"):
