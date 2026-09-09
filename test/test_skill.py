@@ -120,7 +120,7 @@ class TestSkillMethods(SkillTestCase):
         self.skill.speak.assert_not_called()
         self.skill.speak_dialog.assert_called_once_with(
             "native_action_not_supported",
-            {"action": "launch_sms_app", "description": "the sms app"},
+            {"action": "launch_sms_app", "description": "the messages app"},
             message=message)
 
     def test_send_sms_node_missing_content_speaks_error(self):
