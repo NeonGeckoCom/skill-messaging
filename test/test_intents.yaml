@@ -1,0 +1,50 @@
+# Specify intents to test here. Valid test cases are as follows:
+
+# Basic intent match tests only:
+#lang:
+#  intent_name:
+#    - example utterance
+#    - other example utterance
+
+# Intent tests with expected vocab/entity matches:
+#lang:
+#  intent_name:
+#    - example_utterance:
+#        - expected vocab name
+#        - other expected vocab name
+
+# Intent tests with specific vocab/entity extraction tests:
+#lang:
+#  intent_name:
+#    - example_utterance:
+#        - expected_vocab_key: expected_vocab_value
+#        - expected_entity_key: expected_entity_value
+
+
+en-us:
+  DraftEmailIntent:
+    - send email:
+        - draft
+        - email
+    - draft email
+    - start email
+    - create email
+    - send an email
+    - draft an email
+    - send email message:
+        - draft
+        - email
+        - message
+    - neon send email:
+        - Neon
+        - draft
+        - email
+
+unmatched intents:
+  en-us:
+    - send a text
+    - send a text message
+    - call daniel
+    - what is my email
+    - email neon
+    - draft a message

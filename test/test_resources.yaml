@@ -1,0 +1,40 @@
+# Specify resources to test here.
+
+# Specify languages to be tested
+languages:
+  - "en-us"
+
+# vocab is lowercase .voc file basenames
+vocab:
+  - draft
+  - email
+  - klat
+  - message
+  - neon
+  - "no"
+  - sms
+  - "yes"
+
+# dialog is .dialog file basenames (case-sensitive)
+dialog:
+  - ConfirmCall
+  - ConfirmEmail
+  - ConfirmMessage
+  - ConfirmSend
+  - ContactNotFound
+  - DiscardDraft
+  - EmailSent
+  - ErrorDialog
+  - GetEmailBody
+  - GetEmailSubject
+  - GetRecipientAddress
+  - OnlyMobile
+  - TextSent
+# regex entities, not necessarily filenames
+regex: []
+intents:
+  # Padatious intents are the `.intent` file names
+  padatious: []
+  # Adapt intents are the name passed to the constructor
+  adapt:
+    - DraftEmailIntent
