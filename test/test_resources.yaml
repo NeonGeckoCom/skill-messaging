@@ -30,6 +30,12 @@ dialog:
   - GetRecipientAddress
   - OnlyMobile
   - TextSent
+  - launch_email_app
+  - launch_sms_app
+  - native_action_error
+  - native_action_not_supported
+  - native_action_success
+  - native_action_timeout
 # regex entities, not necessarily filenames
 regex: []
 intents:
