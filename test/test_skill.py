@@ -35,8 +35,8 @@ from neon_minerva.tests.skill_unit_test_base import SkillTestCase
 
 def _node_message(msg_type: str, skill_data: dict, action_key: str,
                   action_supported: bool = True,
-                  session_id: str = "node-test-1"):
-    return Message(msg_type, {"skill_data": skill_data}, {
+                  session_id: str = "node-test-1", **data):
+    return Message(msg_type, {"skill_data": skill_data, **data}, {
         "node": {
             "node_id": "node-test-1",
             "node_name": "Test Node",
@@ -131,6 +131,34 @@ class TestSkillMethods(SkillTestCase):
         self.skill.speak_dialog.assert_called_once_with(
             "ErrorDialog", message=message)
 
+    def test_send_sms_node_vocab_match_extracts_from_request(self):
+        # A `sms` vocab hit in CMS_match_message_phrase returns only `kind`;
+        # recipient and body must then come from the request text.
+        message = _node_message(
+            "SendSMSIntent", {"kind": "sms"}, "launch_sms_app",
+            request="send a text to my wife that says I'm running late")
+        emitted = []
+        self.skill.bus.once("node.invoke_native",
+                            lambda m: emitted.append(m))
+        _arm_node_reply(self.skill.bus, _response("launch_sms_app"))
+
+        self.skill.handle_send_sms(message)
+
+        self.assertEqual(len(emitted), 1)
+        self.assertEqual(emitted[0].data["params"],
+                         {"to": "my wife", "body": "I'm running late"})
+        self.skill.speak_dialog.assert_not_called()
+
+    def test_send_sms_node_vocab_match_without_recipient_speaks_error(self):
+        message = _node_message(
+            "SendSMSIntent", {"kind": "sms"}, "launch_sms_app",
+            request="send a text message")
+
+        self.skill.handle_send_sms(message)
+
+        self.skill.speak_dialog.assert_called_once_with(
+            "ErrorDialog", message=message)
+
     def test_send_email_node_dispatches_with_params(self):
         message = _node_message(
             "DraftEmailIntent",
@@ -198,6 +226,44 @@ class TestSkillMethods(SkillTestCase):
             "native_action_not_supported",
             {"action": "launch_email_app", "description": "the email app"},
             message=message)
+
+    def test_send_email_node_vocab_match_extracts_from_request(self):
+        message = _node_message(
+            "DraftEmailIntent", {"kind": "email"}, "launch_email_app",
+            request="send an email to sarah at example dot com "
+                    "subject the project")
+        emitted = []
+        self.skill.bus.once("node.invoke_native",
+                            lambda m: emitted.append(m))
+        _arm_node_reply(self.skill.bus, _response("launch_email_app"))
+
+        self.skill.handle_send_email(message)
+
+        self.assertEqual(len(emitted), 1)
+        self.assertEqual(emitted[0].data["params"],
+                         {"to": "sarah@example.com",
+                          "subject": "the project"})
+        self.skill.speak_dialog.assert_not_called()
+
+    def test_send_email_node_draft_intent_extracts_from_utterance(self):
+        # DraftEmailIntent is a direct Adapt match: no `skill_data` at all,
+        # only `utterance`.
+        message = _node_message(
+            "DraftEmailIntent", None, "launch_email_app",
+            utterance="draft an email to sarah at example dot com "
+                      "subject the project")
+        emitted = []
+        self.skill.bus.once("node.invoke_native",
+                            lambda m: emitted.append(m))
+        _arm_node_reply(self.skill.bus, _response("launch_email_app"))
+
+        self.skill.handle_send_email(message)
+
+        self.assertEqual(len(emitted), 1)
+        self.assertEqual(emitted[0].data["params"],
+                         {"to": "sarah@example.com",
+                          "subject": "the project"})
+        self.skill.speak_dialog.assert_not_called()
 
     def test_send_email_node_missing_recipient_speaks_error(self):
         message = _node_message("DraftEmailIntent",
