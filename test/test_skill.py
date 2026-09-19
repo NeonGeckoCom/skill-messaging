@@ -265,6 +265,39 @@ class TestSkillMethods(SkillTestCase):
                           "subject": "the project"})
         self.skill.speak_dialog.assert_not_called()
 
+    def test_send_email_node_that_says_becomes_body(self):
+        # Seen on a real Hub: DraftEmailIntent with "that says" and no
+        # subject. Adapt's utterance is the normalized one.
+        message = _node_message(
+            "DraftEmailIntent", None, "launch_email_app",
+            utterance="draft email to emily that says hi")
+        emitted = []
+        self.skill.bus.once("node.invoke_native",
+                            lambda m: emitted.append(m))
+        _arm_node_reply(self.skill.bus, _response("launch_email_app"))
+
+        self.skill.handle_send_email(message)
+
+        self.assertEqual(len(emitted), 1)
+        self.assertEqual(emitted[0].data["params"],
+                         {"to": "emily", "body": "hi"})
+        self.skill.speak_dialog.assert_not_called()
+
+    def test_send_email_node_saying_with_spoken_address(self):
+        message = _node_message(
+            "DraftEmailIntent", {"kind": "email"}, "launch_email_app",
+            request="send an email to sarah at example dot com "
+                    "saying running late")
+        emitted = []
+        self.skill.bus.once("node.invoke_native",
+                            lambda m: emitted.append(m))
+        _arm_node_reply(self.skill.bus, _response("launch_email_app"))
+
+        self.skill.handle_send_email(message)
+
+        self.assertEqual(emitted[0].data["params"],
+                         {"to": "sarah@example.com", "body": "running late"})
+
     def test_send_email_node_missing_recipient_speaks_error(self):
         message = _node_message("DraftEmailIntent",
                                 {"subject": "The project"},

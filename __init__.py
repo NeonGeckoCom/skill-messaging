@@ -390,7 +390,7 @@ class MessagingSkill(CommonMessageSkill):
         subject = skill_data.get("subject")
         body = skill_data.get("body")
         if not recipient or not (subject or body):
-            recipient, subject = self._extract_content_email(
+            recipient, subject, body = self._extract_node_email_content(
                 self._node_request_text(message))
         if not recipient or not (subject or body):
             LOG.warning(f"Node email request missing recipient or content: "
@@ -404,6 +404,22 @@ class MessagingSkill(CommonMessageSkill):
             params["body"] = body
         invoke_native_action(self, message, NodeNativeAction.LAUNCH_EMAIL_APP,
                             params=params)
+
+    @classmethod
+    def _extract_node_email_content(cls, utt):
+        """
+        Recipient, subject, and body for a single-shot email request.
+        `_extract_content_email` only knows `subject`; a spoken body
+        (`that says`, `saying`) is parsed by `_extract_content_sms`.
+        @return: (str?, str?, str?) recipient, subject, body
+        """
+        recipient, subject = cls._extract_content_email(utt)
+        if subject:
+            return recipient, subject, None
+        sms_recipient, body, conf = cls._extract_content_sms(utt)
+        if body and conf == CMSMatchLevel.MEDIA:
+            return cls._parse_email_address(sms_recipient), None, body
+        return recipient, None, None
 
     @staticmethod
     def _node_request_text(message) -> str:
@@ -660,22 +676,31 @@ class MessagingSkill(CommonMessageSkill):
             recipient = remainder
             subject = None
 
-        # Parse out email words
-        if recipient:
-            if "dot" in recipient.split():
-                recipient = recipient.replace(" dot ", ".")
-            if "at" in recipient.split():
-                recipient = recipient.replace(" at ", "@").lower()
-            if "@" in recipient:
-                # Look at domain (i.e. .com, .co.uk)
-                recipient_prefix = recipient.split("@", 1)[0].replace(" ", "")
-                recipient_domain = recipient.split("@", 1)[1].split(".")[0].replace(" ", "")
-                tld_parts = recipient.split("@", 1)[1].split(".")[1:]
-                domain_parts = [part.split()[0] for part in tld_parts]
-                tld = ".".join(domain_parts)
-                recipient = f"{recipient_prefix}@{recipient_domain}.{tld}"
-            LOG.info(f"DM: {recipient}")
+        recipient = MessagingSkill._parse_email_address(recipient)
         return recipient, subject
+
+    @staticmethod
+    def _parse_email_address(recipient):
+        """
+        Turn a spoken address (`sarah at example dot com`) into
+        `sarah@example.com`; a plain name is returned unchanged.
+        """
+        if not recipient:
+            return recipient
+        if "dot" in recipient.split():
+            recipient = recipient.replace(" dot ", ".")
+        if "at" in recipient.split():
+            recipient = recipient.replace(" at ", "@").lower()
+        if "@" in recipient:
+            # Look at domain (i.e. .com, .co.uk)
+            recipient_prefix = recipient.split("@", 1)[0].replace(" ", "")
+            recipient_domain = recipient.split("@", 1)[1].split(".")[0].replace(" ", "")
+            tld_parts = recipient.split("@", 1)[1].split(".")[1:]
+            domain_parts = [part.split()[0] for part in tld_parts]
+            tld = ".".join(domain_parts)
+            recipient = f"{recipient_prefix}@{recipient_domain}.{tld}"
+        LOG.info(f"DM: {recipient}")
+        return recipient
 
     def stop(self):
         pass
