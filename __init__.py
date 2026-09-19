@@ -361,13 +361,17 @@ class MessagingSkill(CommonMessageSkill):
     def _handle_send_sms_node(self, message):
         """
         Single-shot Node path for `text X that Y`. Does not use the mobile
-        draft state machine: extraction already ran in
-        `CMS_match_message_phrase`, so this dispatches straight to the
-        neon-utils helper.
+        draft state machine. `CMS_match_message_phrase` only extracts a
+        recipient and body when no `sms`/`email` vocab word matched, so a
+        vocab match arrives with `kind` alone and the request text is parsed
+        here, as the mobile path does.
         """
         skill_data = message.data.get("skill_data") or {}
         recipient = skill_data.get("recipient")
         body = skill_data.get("message")
+        if not recipient or not body:
+            recipient, body, _ = self._extract_content_sms(
+                self._node_request_text(message))
         if not recipient or not body:
             LOG.warning(f"Node SMS request missing recipient or body: "
                        f"{skill_data}")
@@ -386,6 +390,9 @@ class MessagingSkill(CommonMessageSkill):
         subject = skill_data.get("subject")
         body = skill_data.get("body")
         if not recipient or not (subject or body):
+            recipient, subject = self._extract_content_email(
+                self._node_request_text(message))
+        if not recipient or not (subject or body):
             LOG.warning(f"Node email request missing recipient or content: "
                        f"{skill_data}")
             self.speak_dialog("ErrorDialog", message=message)
@@ -397,6 +404,15 @@ class MessagingSkill(CommonMessageSkill):
             params["body"] = body
         invoke_native_action(self, message, NodeNativeAction.LAUNCH_EMAIL_APP,
                             params=params)
+
+    @staticmethod
+    def _node_request_text(message) -> str:
+        """
+        Raw request text for a Node turn: `request` on the Common Messaging
+        callback, `utterance` on a direct Adapt match (DraftEmailIntent).
+        """
+        return message.data.get("request") or \
+            message.data.get("utterance") or ""
 
     def handle_place_call(self, message):
         if message.context.get("mobile"):
@@ -592,7 +608,7 @@ class MessagingSkill(CommonMessageSkill):
             if "to" in utt.split():
                 remainder = utt.split(" to ", 1)[1]
             else:
-                return None, None
+                return None, None, None
             LOG.debug(remainder)
             recipient = remainder.split()[0]
             LOG.debug(recipient)
